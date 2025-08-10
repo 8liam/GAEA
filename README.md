@@ -1,4 +1,6 @@
 # GAEA — Generative AI Next.js + TailwindCSS Component Creation
+<img width="1680" height="1004" alt="Screenshot 2025-08-09 at 11 44 23 pm" src="https://github.com/user-attachments/assets/f91bb9ed-c1f2-4e6c-95d7-40b495c39b6d" />
+
 
 A modern, open-source playground for generating, previewing, and applying UI code via OpenRouter. Built on Next.js App Router with TypeScript and Tailwind CSS, it streams AI-generated snippets into a live, sandboxed preview and optionally writes pages/components into your app (with safety guards).
 
