@@ -130,10 +130,7 @@ function injectInlineComponentIntoHomePage(componentRelPath: string, sourceCode:
         content = content + inlineSource;
     }
 
-    const propSnippet = (() => {
-        const inner = extractInnerJsxFromReturn(sourceCode);
-        return /\blabel\s*:\s*string\b/.test(sourceCode) ? ' label="Preview"' : '';
-    })();
+    const propSnippet = /\blabel\s*:\s*string\b/.test(sourceCode) ? ' label="Preview"' : '';
 
     const marker = '{/* You can add your main content here */}';
     const usage = `\n        <div className=\"mt-8\"><${generatedName}${propSnippet} /></div>\n`;
@@ -175,7 +172,7 @@ export async function POST(req: NextRequest) {
         if (pageMatch) {
             try {
                 createOrUpdateFile(absTarget, parsed.code);
-            } catch (err) {
+            } catch {
                 return NextResponse.json({ error: 'Write failed (read-only filesystem?)' }, { status: 500 });
             }
             const routeSegment = pageMatch[1];
@@ -192,7 +189,7 @@ export async function POST(req: NextRequest) {
 
         try {
             createOrUpdateFile(absTarget, parsed.code);
-        } catch (err) {
+        } catch {
             return NextResponse.json({ error: 'Write failed (read-only filesystem?)' }, { status: 500 });
         }
         return NextResponse.json(result);

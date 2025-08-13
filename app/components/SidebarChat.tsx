@@ -7,7 +7,7 @@ import Image from "next/image";
 interface SidebarChatProps {
     isOpen: boolean;
     width: number;
-    onResize: (width: number) => void; // kept for prop compatibility, unused
+    onResize: (_width: number) => void; // kept for prop compatibility, unused
     onOpenChange: (open: boolean) => void;
 }
 

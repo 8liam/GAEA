@@ -16,7 +16,7 @@ export default function HowItWorks() {
                 </div>
 
                 <ol className="mt-10 grid grid-cols-1 gap-4 sm:grid-cols-3">
-                    {steps.map((s, idx) => {
+                    {steps.map((s) => {
                         const Icon = s.icon;
                         return (
                             <li key={s.title} className="rounded-xl border border-white/10 bg-white/5 p-5">

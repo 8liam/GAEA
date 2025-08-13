@@ -10,7 +10,7 @@ export default function MainPreview() {
   useEffect(() => {
     const channel = new BroadcastChannel("ai-preview");
     const handler = (event: MessageEvent<{ code?: string; filePath?: string; loading?: boolean }>) => {
-      const data = event.data as any;
+      const data = event.data;
       if (typeof data?.code === "string") {
         setCode(data.code);
       }
