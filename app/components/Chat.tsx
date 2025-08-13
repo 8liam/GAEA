@@ -3,6 +3,7 @@
 import { useEffect, useRef, useState } from 'react';
 import { useRouter } from 'next/navigation';
 import { MarkdownRenderer } from '../utils/markdown-renderer';
+import Image from 'next/image';
 
 interface Message {
     role: 'user' | 'assistant' | 'system';
@@ -59,6 +60,13 @@ export default function Chat() {
         setInput('');
         setIsLoading(true);
 
+        // Notify preview: thinking
+        try {
+            const ch = new BroadcastChannel('ai-preview');
+            ch.postMessage({ loading: true });
+            setTimeout(() => ch.close(), 500);
+        } catch { }
+
         try {
             const response = await fetch('/api/code', {
                 method: 'POST',
@@ -85,10 +93,10 @@ export default function Chat() {
             const snippet = extractFirstJsxBlock(assistantMessage.content);
             if (snippet) {
                 try {
-                    previewChannelRef.current?.postMessage({ code: snippet.code, filePath: snippet.filePath });
+                    previewChannelRef.current?.postMessage({ code: snippet.code, filePath: snippet.filePath, loading: false });
                 } catch {
                     const channel = new BroadcastChannel('ai-preview');
-                    channel.postMessage({ code: snippet.code, filePath: snippet.filePath });
+                    channel.postMessage({ code: snippet.code, filePath: snippet.filePath, loading: false });
                     setTimeout(() => channel.close(), 500);
                 }
             }
@@ -102,6 +110,11 @@ export default function Chat() {
             setMessages((prev) => [...prev, errorMessage]);
         } finally {
             setIsLoading(false);
+            try {
+                const ch2 = new BroadcastChannel('ai-preview');
+                ch2.postMessage({ loading: false });
+                setTimeout(() => ch2.close(), 500);
+            } catch { }
         }
     };
 
@@ -120,6 +133,12 @@ export default function Chat() {
     const applyGeneratedCode = async (index: number) => {
         try {
             setApplyingIndex(index);
+            // Remove thinking border immediately when applying code
+            try {
+                const ch = new BroadcastChannel('ai-preview');
+                ch.postMessage({ loading: false });
+                setTimeout(() => ch.close(), 500);
+            } catch { }
             const msg = messages[index];
             const res = await fetch('/api/apply', {
                 method: 'POST',
@@ -154,6 +173,12 @@ export default function Chat() {
             ]);
         } finally {
             setApplyingIndex(null);
+            // Ensure border remains hidden after apply completes
+            try {
+                const ch2 = new BroadcastChannel('ai-preview');
+                ch2.postMessage({ loading: false });
+                setTimeout(() => ch2.close(), 500);
+            } catch { }
         }
     };
 
@@ -251,22 +276,39 @@ export default function Chat() {
                         {isLoading && (
                             <div className="flex justify-start">
                                 <div className="w-full">
-                                    <div className="rounded-2xl border border-white/10 bg-white/5 px-4 py-3 text-gray-100 backdrop-blur-md shadow-lg">
-                                        <div className="flex items-center gap-2">
-                                            <span className="h-2 w-2 animate-bounce rounded-full bg-gray-300" />
-                                            <span
-                                                className="h-2 w-2 animate-bounce rounded-full bg-gray-300"
-                                                style={{ animationDelay: '0.12s' }}
-                                            />
-                                            <span
-                                                className="h-2 w-2 animate-bounce rounded-full bg-gray-300"
-                                                style={{ animationDelay: '0.24s' }}
-                                            />
-                                        </div>
+                                    <div className='grid grid-cols-12'>
+
+                                        <Image src="/gaea-logo.png"
+                                            alt="GAEA Thinking"
+                                            width={20}
+                                            height={20}
+                                            className="object-contain animate-pulse col-span-1"
+                                        />
+                                        <p className="ml-2 text-gray-400 col-span-11 shimmer-text">GAEA Is Thinking...</p>
                                     </div>
                                 </div>
+                                <style jsx>{`
+                                  @keyframes shimmer {
+                                    from { background-position: -200% 0; }
+                                    to { background-position: 200% 0; }
+                                  }
+                                  .shimmer-text {
+                                    background: linear-gradient(90deg, rgba(255,255,255,0.15), rgba(255,255,255,0.95), rgba(255,255,255,0.15));
+                                    background-size: 200% 100%;
+                                    -webkit-background-clip: text;
+                                    background-clip: text;
+                                    -webkit-text-fill-color: transparent;
+                                    animation: shimmer 2.75s linear infinite;
+                                    white-space: nowrap;
+                                  }
+                                `}</style>
                             </div>
+
+
                         )}
+
+
+
                     </div>
 
                     <div ref={messagesEndRef} />

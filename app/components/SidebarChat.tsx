@@ -2,6 +2,8 @@
 import { useRef } from "react";
 import Chat from "./Chat";
 import { PanelLeft } from "lucide-react";
+import Link from "next/link";
+import Image from "next/image";
 interface SidebarChatProps {
     isOpen: boolean;
     width: number;
@@ -44,7 +46,17 @@ export default function SidebarChat({ isOpen, width, onResize, onOpenChange }: S
             >
                 {/* Header with minimize */}
                 <div className="flex items-center justify-between px-3 py-4 border-b border-gray-200 dark:border-gray-800 bg-white/80 dark:bg-[#18192b]/80 backdrop-blur-md">
-                    <span className="font-semibold text-gray-800 dark:text-gray-100 text-base">GAEA</span>
+                    <Link href="/" className="flex items-center gap-3">
+                        <Image src="/gaea-logo.png"
+                            alt="GAEA Thinking"
+                            width={28}
+                            height={28}
+                            className="object-contain col-span-1"
+                        />
+                        <span className="text-lg font-semibold tracking-tight text-white">
+                            <span className="text-white">GAEA</span>
+                        </span>
+                    </Link>
                     <div className="flex items-center gap-2">
                         <button
                             className="p-1 rounded hover:bg-gray-100 dark:hover:bg-gray-800"
